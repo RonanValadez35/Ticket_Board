@@ -1,0 +1,19 @@
+.ticket {
+    display: flex;
+    width: 150px;
+    height: 150px;
+    background-color: white;
+    border-width: medium;
+    border-style: solid;
+    border-color: black;
+    display: grid;
+    place-items: center;
+}
+
+.ticket-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 200px;
+    align-items: center;
+}
