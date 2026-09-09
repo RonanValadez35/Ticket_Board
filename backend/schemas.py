@@ -14,3 +14,9 @@ class TicketRead(BaseModel):
     title: str
     status: str
     description: str
+
+
+class TicketUpdate(BaseModel):
+    title: str | None = None
+    description: str | None = None
+    status: str | None = None

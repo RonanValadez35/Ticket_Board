@@ -1,13 +1,61 @@
 .ticket {
-    display: flex;
+    position: relative;
     width: 150px;
     height: 150px;
+    padding: 36px 10px 10px;
+    box-sizing: border-box;
     background-color: white;
     border-width: medium;
     border-style: solid;
     border-color: black;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.ticket h3 {
+    width: 100%;
+    margin: 0;
+    text-align: center;
+    overflow-wrap: anywhere;
+}
+
+.ticket p {
+    text-align: center;
+    overflow-wrap: anywhere;
+}
+
+.ticket-edit-button {
+    position: absolute;
+    top: 8px;
+    right: 8px;
     display: grid;
+    width: 26px;
+    height: 26px;
+    padding: 4px;
     place-items: center;
+    border: 1px solid #b7b7b7;
+    border-radius: 6px;
+    background: white;
+    cursor: pointer;
+}
+
+.ticket-edit-button:hover {
+    background: #eeeeee;
+}
+
+.ticket-edit-button:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+.ticket-edit-button img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
 }
 
 .ticket-list {

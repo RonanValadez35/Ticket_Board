@@ -1,6 +1,7 @@
 import { Route, Routes, useNavigate } from 'react-router-dom'
 import TicketList from './components/ticketList.tsx'
 import CreateTicketForm from './components/createTicketForm.tsx'
+import EditTicketForm from './components/editTicketForm.tsx'
 import './App.css'
 
 function Board() {
@@ -28,6 +29,7 @@ function App() {
     <Routes>
       <Route path="/" element={<Board />} />
       <Route path="/create" element={<CreateTicketForm />} />
+      <Route path="/tickets/:ticketId/edit" element={<EditTicketForm />} />
     </Routes>
   )
 }

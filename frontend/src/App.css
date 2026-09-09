@@ -28,3 +28,50 @@
   align-items: flex-start;
   gap: 16px;
 }
+
+.ticket-form-page {
+  width: min(520px, 100%);
+  margin: 0 auto;
+  padding: 32px 24px;
+  box-sizing: border-box;
+  text-align: left;
+}
+
+.ticket-form-page h1 {
+  margin: 24px 0;
+}
+
+.ticket-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.ticket-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: var(--text-h);
+}
+
+.ticket-form input,
+.ticket-form textarea,
+.ticket-form select {
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text-h);
+  font: inherit;
+}
+
+.ticket-form button {
+  align-self: flex-start;
+  padding: 8px 14px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--accent-bg);
+  color: var(--text-h);
+  font: inherit;
+  cursor: pointer;
+}

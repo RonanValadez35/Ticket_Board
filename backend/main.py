@@ -1,13 +1,13 @@
 from contextlib import asynccontextmanager
 
-from fastapi import Depends, FastAPI
+from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database import Base, engine, get_session
 import models
-from schemas import TicketCreate, TicketRead
+from schemas import TicketCreate, TicketRead, TicketUpdate
 
 
 @asynccontextmanager
@@ -50,3 +50,36 @@ async def create_ticket(
     await session.commit()
     await session.refresh(db_ticket)
     return db_ticket
+
+
+@app.get("/tickets/{ticket_id}", response_model=TicketRead)
+async def get_ticket(
+    ticket_id: int,
+    session: AsyncSession = Depends(get_session),
+):
+    ticket = await session.get(models.Ticket, ticket_id)
+    if ticket is None:
+        raise HTTPException(status_code=404, detail="Ticket not found")
+
+    return ticket
+
+
+@app.patch("/tickets/{ticket_id}", response_model=TicketRead)
+async def edit_ticket(
+    ticket_id: int,
+    changes: TicketUpdate,
+    session: AsyncSession = Depends(get_session),
+):
+    ticket = await session.get(models.Ticket, ticket_id)
+    if ticket is None:
+        raise HTTPException(status_code=404, detail="Ticket not found")
+    
+    for field, value in changes.model_dump(
+        exclude_unset=True,
+        exclude_none=True,
+    ).items():
+        setattr(ticket, field, value)
+
+    await session.commit()
+    await session.refresh(ticket)
+    return ticket

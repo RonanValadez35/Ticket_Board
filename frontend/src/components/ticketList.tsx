@@ -26,6 +26,7 @@ export default function TicketList({ title }: { title: string }) {
                 .map((ticket) => (
                     <Ticket
                         key={ticket.id}
+                        id={ticket.id}
                         title={ticket.title}
                         description={ticket.description}
                     />
