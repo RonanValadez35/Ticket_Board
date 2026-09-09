@@ -1,9 +1,30 @@
 .board {
   display: flex;
-  flex-direction: row;
-  align-items: flex-start;
+  flex-direction: column;
   gap: 16px;
   width: 100%;
   box-sizing: border-box;
   padding: 24px;
+}
+
+.board-header {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.board-header button {
+  padding: 8px 14px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--accent-bg);
+  color: var(--text-h);
+  font: inherit;
+  cursor: pointer;
+}
+
+.board-columns {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 16px;
 }

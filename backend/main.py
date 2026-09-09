@@ -41,10 +41,12 @@ async def create_ticket(
     ticket: TicketCreate,
     session: AsyncSession = Depends(get_session),
 ):
-    db_ticket = models.Ticket(title=ticket.title, status=ticket.status)
+    db_ticket = models.Ticket(
+        title=ticket.title,
+        status=ticket.status,
+        description=ticket.description,
+    )
     session.add(db_ticket)
     await session.commit()
     await session.refresh(db_ticket)
     return db_ticket
-
-    

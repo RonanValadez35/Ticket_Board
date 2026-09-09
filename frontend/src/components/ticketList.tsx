@@ -5,6 +5,7 @@ import "../styles/ticket.css";
 type TicketData = {
     id: number;
     title: string;
+    description: string;
     status: string;
 };
 
@@ -26,7 +27,7 @@ export default function TicketList({ title }: { title: string }) {
                     <Ticket
                         key={ticket.id}
                         title={ticket.title}
-                        description={ticket.status}
+                        description={ticket.description}
                     />
                 ))}
         </div>

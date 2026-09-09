@@ -3,7 +3,8 @@ from pydantic import BaseModel, ConfigDict
 
 class TicketCreate(BaseModel):
     title: str
-    status: str
+    status: str = "Backlog"
+    description: str = ""
 
 
 class TicketRead(BaseModel):
@@ -12,3 +13,4 @@ class TicketRead(BaseModel):
     id: int
     title: str
     status: str
+    description: str
