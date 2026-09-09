@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
 import { Navigate, Route, Routes, useNavigate } from 'react-router-dom'
-import AuthPage, { type AuthUser } from './components/AuthPage.tsx'
+import SignInPage from './components/SignInPage.tsx'
+import CreateAccountPage from './components/CreateAccountPage.tsx'
 import TicketList from './components/ticketList.tsx'
 import CreateTicketForm from './components/createTicketForm.tsx'
 import EditTicketForm from './components/editTicketForm.tsx'
+import type { AuthUser } from './types/auth.ts'
 import type { TicketData, TicketStatus } from './types/ticket.ts'
 import './App.css'
 
@@ -140,11 +142,11 @@ function App() {
     <Routes>
       <Route
         path="/signin"
-        element={user ? <Navigate to="/" replace /> : <AuthPage mode="signin" onAuthenticated={handleAuthenticated} />}
+        element={user ? <Navigate to="/" replace /> : <SignInPage onAuthenticated={handleAuthenticated} />}
       />
       <Route
         path="/signup"
-        element={user ? <Navigate to="/" replace /> : <AuthPage mode="signup" onAuthenticated={handleAuthenticated} />}
+        element={user ? <Navigate to="/" replace /> : <CreateAccountPage onAuthenticated={handleAuthenticated} />}
       />
       <Route path="/" element={user ? <Board user={user} onSignOut={handleSignOut} /> : <Navigate to="/signin" replace />} />
       <Route path="/create" element={user ? <CreateTicketForm /> : <Navigate to="/signin" replace />} />

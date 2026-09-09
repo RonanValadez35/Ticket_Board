@@ -1,16 +1,11 @@
 import { useState, type SyntheticEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import type { AuthUser } from '../types/auth.ts'
 import '../styles/auth.css'
 
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://127.0.0.1:8000'
 
-export interface AuthUser {
-  id: number
-  username: string
-}
-
-interface AuthPageProps {
-  mode: 'signin' | 'signup'
+interface SignInPageProps {
   onAuthenticated: (user: AuthUser) => void
 }
 
@@ -18,13 +13,14 @@ interface ApiError {
   detail?: string | Array<{ msg: string }>
 }
 
-export default function AuthPage({ mode, onAuthenticated }: AuthPageProps) {
+export default function SignInPage({
+  onAuthenticated,
+}: SignInPageProps) {
   const navigate = useNavigate()
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const isSignUp = mode === 'signup'
 
   async function handleSubmit(event: SyntheticEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -32,7 +28,7 @@ export default function AuthPage({ mode, onAuthenticated }: AuthPageProps) {
     setIsSubmitting(true)
 
     try {
-      const response = await fetch(`${API_URL}/auth/${mode}`, {
+      const response = await fetch(`${API_URL}/auth/signin`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
@@ -44,7 +40,7 @@ export default function AuthPage({ mode, onAuthenticated }: AuthPageProps) {
         throw new Error(
           typeof detail === 'string'
             ? detail
-            : detail?.[0]?.msg ?? 'Unable to complete your request',
+            : detail?.[0]?.msg ?? 'Unable to sign in',
         )
       }
 
@@ -63,16 +59,10 @@ export default function AuthPage({ mode, onAuthenticated }: AuthPageProps) {
 
   return (
     <main className="auth-page">
-      <section className="auth-card" aria-labelledby="auth-title">
+      <section className="auth-card" aria-labelledby="signin-title">
         <div className="auth-heading">
-          <h1 id="auth-title">
-            {isSignUp ? 'Create account' : 'Sign in'}
-          </h1>
-          <p>
-            {isSignUp
-              ? 'Choose a username and password.'
-              : 'Sign in to access your ticket board.'}
-          </p>
+          <h1 id="signin-title">Sign in</h1>
+          <p>Sign in to access your ticket board.</p>
         </div>
 
         <form className="auth-form" onSubmit={handleSubmit}>
@@ -80,7 +70,6 @@ export default function AuthPage({ mode, onAuthenticated }: AuthPageProps) {
             Username
             <input
               autoComplete="username"
-              minLength={isSignUp ? 3 : 1}
               maxLength={100}
               onChange={(event) => setUsername(event.target.value)}
               placeholder="Enter your username"
@@ -92,17 +81,13 @@ export default function AuthPage({ mode, onAuthenticated }: AuthPageProps) {
           <label>
             Password
             <input
-              autoComplete={isSignUp ? 'new-password' : 'current-password'}
-              minLength={isSignUp ? 8 : 1}
+              autoComplete="current-password"
               onChange={(event) => setPassword(event.target.value)}
-              placeholder={
-                isSignUp ? 'Create a password' : 'Enter your password'
-              }
+              placeholder="Enter your password"
               required
               type="password"
               value={password}
             />
-            {isSignUp && <small>Use at least 8 characters.</small>}
           </label>
 
           {error && (
@@ -112,21 +97,13 @@ export default function AuthPage({ mode, onAuthenticated }: AuthPageProps) {
           )}
 
           <button className="auth-submit" type="submit" disabled={isSubmitting}>
-            {isSubmitting
-              ? 'Please wait…'
-              : isSignUp
-                ? 'Create account'
-                : 'Sign in'}
+            {isSubmitting ? 'Please wait…' : 'Sign in'}
           </button>
         </form>
 
         <div className="auth-secondary">
-          <p>
-            {isSignUp ? 'Already have an account?' : "Don't have an account?"}
-          </p>
-          <Link to={isSignUp ? '/signin' : '/signup'}>
-            {isSignUp ? 'Sign in' : 'Create account'}
-          </Link>
+          <p>Don't have an account?</p>
+          <Link to="/signup">Create account</Link>
         </div>
       </section>
     </main>
