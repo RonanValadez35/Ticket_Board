@@ -3,11 +3,19 @@ from contextlib import asynccontextmanager
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from database import Base, engine, get_session
 import models
-from schemas import TicketCreate, TicketRead, TicketUpdate
+from database import Base, engine, get_session
+from schemas import (
+    AccountCreate,
+    SignIn,
+    TicketCreate,
+    TicketRead,
+    TicketUpdate,
+    UserRead,
+)
 
 
 @asynccontextmanager
@@ -28,8 +36,48 @@ app.add_middleware(
 )
 
 
+@app.post("/auth/signup", response_model=UserRead, status_code=201)
+async def create_account(
+    credentials: AccountCreate,
+    session: AsyncSession = Depends(get_session),
+):
+    existing_user = await session.scalar(
+        select(models.User).where(models.User.username == credentials.username)
+    )
+    if existing_user is not None:
+        raise HTTPException(status_code=409, detail="Username is already taken")
+
+    user = models.User.with_password(credentials.username, credentials.password)
+    session.add(user)
+    try:
+        await session.commit()
+    except IntegrityError:
+        await session.rollback()
+        raise HTTPException(
+            status_code=409,
+            detail="Username is already taken",
+        ) from None
+
+    await session.refresh(user)
+    return user
+
+
+@app.post("/auth/signin", response_model=UserRead)
+async def sign_in(
+    credentials: SignIn,
+    session: AsyncSession = Depends(get_session),
+):
+    user = await session.scalar(
+        select(models.User).where(models.User.username == credentials.username)
+    )
+    if user is None or not user.verify_password(credentials.password):
+        raise HTTPException(status_code=401, detail="Invalid username or password")
+
+    return user
+
+
 @app.get("/", response_model=list[TicketRead])
-async def root( session: AsyncSession = Depends(get_session)):
+async def root(session: AsyncSession = Depends(get_session)):
     query = select(models.Ticket)
     result = await session.execute(query)
     tickets = result.scalars().all()
