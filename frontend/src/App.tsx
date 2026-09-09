@@ -10,7 +10,15 @@ function Board() {
   return (
     <main className="board">
       <header className="board-header">
+        <div>
+          <p className="board-eyebrow">Engineering workspace</p>
+          <h1>Ticket Board</h1>
+          <p className="board-subtitle">
+            Plan, track, and ship your team's work.
+          </p>
+        </div>
         <button type="button" onClick={() => navigate('/create')}>
+          <span aria-hidden="true">+</span>
           New ticket
         </button>
       </header>

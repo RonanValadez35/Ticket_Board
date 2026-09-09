@@ -18,19 +18,36 @@ export default function TicketList({ title }: { title: string }) {
             .then((data: TicketData[]) => setTickets(data));
     }, []);
 
+    const visibleTickets = tickets.filter((ticket) => ticket.status === title);
+    const statusClass = title.toLowerCase().replaceAll(" ", "-");
+
     return (
-        <div className="ticket-list">
-            <h2>{title}</h2>
-            {tickets
-                .filter((ticket) => ticket.status === title)
-                .map((ticket) => (
+        <section className={`ticket-list ticket-list--${statusClass}`}>
+            <header className="ticket-list-header">
+                <div>
+                    <span className="status-dot" aria-hidden="true" />
+                    <h2>{title}</h2>
+                </div>
+                <span className="ticket-count">{visibleTickets.length}</span>
+            </header>
+            <div className="ticket-list-content">
+                {visibleTickets.map((ticket) => (
                     <Ticket
                         key={ticket.id}
                         id={ticket.id}
                         title={ticket.title}
                         description={ticket.description}
+                        onDeleted={(deletedId) =>
+                            setTickets((currentTickets) =>
+                                currentTickets.filter(
+                                    (currentTicket) =>
+                                        currentTicket.id !== deletedId,
+                                ),
+                            )
+                        }
                     />
                 ))}
-        </div>
+            </div>
+        </section>
     );
 }

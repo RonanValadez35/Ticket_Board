@@ -1,67 +1,260 @@
 .ticket {
     position: relative;
-    width: 150px;
-    height: 150px;
-    padding: 36px 10px 10px;
+    width: 100%;
+    min-height: 132px;
+    padding: 44px 16px 18px;
     box-sizing: border-box;
-    background-color: white;
-    border-width: medium;
-    border-style: solid;
-    border-color: black;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 7px;
+    box-shadow: var(--shadow-sm);
+    transition:
+        border-color 160ms ease,
+        box-shadow 160ms ease,
+        transform 160ms ease;
+}
+
+.ticket:hover {
+    border-color: var(--border-strong);
+    box-shadow: 0 8px 18px rgba(23, 32, 51, 0.08);
+    transform: translateY(-2px);
 }
 
 .ticket h3 {
     width: 100%;
     margin: 0;
+    color: var(--text-h);
+    font-size: 0.98rem;
+    line-height: 1.35;
     text-align: center;
     overflow-wrap: anywhere;
 }
 
 .ticket p {
+    margin: 0;
+    color: var(--text);
+    font-size: 0.84rem;
+    line-height: 1.45;
     text-align: center;
     overflow-wrap: anywhere;
 }
 
-.ticket-edit-button {
+.ticket-edit-button,
+.ticket-delete-button {
     position: absolute;
     top: 8px;
-    right: 8px;
     display: grid;
     width: 26px;
     height: 26px;
     padding: 4px;
     place-items: center;
-    border: 1px solid #b7b7b7;
+    border: 1px solid var(--border);
     border-radius: 6px;
-    background: white;
+    background: var(--surface);
     cursor: pointer;
+    opacity: 0.68;
+    transition:
+        background 150ms ease,
+        border-color 150ms ease,
+        opacity 150ms ease,
+        transform 150ms ease;
 }
 
-.ticket-edit-button:hover {
-    background: #eeeeee;
+.ticket-edit-button {
+    right: 8px;
 }
 
-.ticket-edit-button:focus-visible {
+.ticket-delete-button {
+    left: 8px;
+}
+
+.ticket-edit-button:hover,
+.ticket-delete-button:hover {
+    border-color: var(--border-strong);
+    background: var(--surface-muted);
+    opacity: 1;
+    transform: scale(1.05);
+}
+
+.ticket-edit-button:focus-visible,
+.ticket-delete-button:focus-visible {
     outline: 2px solid var(--accent);
     outline-offset: 2px;
 }
 
-.ticket-edit-button img {
+.ticket-edit-button img,
+.ticket-delete-button img {
     display: block;
     width: 100%;
     height: 100%;
     object-fit: contain;
+    opacity: 0.75;
+}
+
+.delete-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: grid;
+    place-items: center;
+    padding: 20px;
+    background: rgba(16, 24, 40, 0.58);
+    backdrop-filter: blur(3px);
+}
+
+.delete-modal {
+    width: min(400px, 100%);
+    padding: 28px;
+    box-sizing: border-box;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--surface);
+    color: var(--text);
+    box-shadow: var(--shadow-md);
+    text-align: center;
+}
+
+.delete-modal h3 {
+    margin: 0 0 8px;
+    color: var(--text-h);
+    font-size: 1.15rem;
+    line-height: 1.35;
+}
+
+.delete-modal > p {
+    margin: 0;
+}
+
+.delete-modal-actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.delete-modal-actions button {
+    padding: 9px 15px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--text-h);
+    font: inherit;
+    font-weight: 650;
+    cursor: pointer;
+    transition:
+        background 150ms ease,
+        border-color 150ms ease;
+}
+
+.delete-modal-actions button:not(.confirm-delete-button):hover {
+    background: var(--surface-muted);
+}
+
+.delete-modal-actions .confirm-delete-button {
+    border-color: var(--danger);
+    background: var(--danger);
+    color: white;
+}
+
+.delete-modal-actions .confirm-delete-button:hover {
+    border-color: var(--danger-hover);
+    background: var(--danger-hover);
+}
+
+.delete-modal-actions button:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.delete-error {
+    margin-top: 12px;
+    color: var(--danger);
 }
 
 .ticket-list {
+    --status-color: #7b879b;
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    width: 200px;
+    min-width: 0;
+    min-height: 480px;
+    padding: 14px;
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--status-color);
+    border-radius: 12px;
+    background: rgba(238, 241, 247, 0.75);
+}
+
+.ticket-list--in-progress {
+    --status-color: #3b82f6;
+}
+
+.ticket-list--under-review {
+    --status-color: #f59e0b;
+}
+
+.ticket-list--completed {
+    --status-color: #10b981;
+}
+
+.ticket-list-header {
+    display: flex;
     align-items: center;
+    justify-content: space-between;
+    padding: 2px 2px 14px;
+}
+
+.ticket-list-header > div {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    flex: 0 0 auto;
+    border-radius: 50%;
+    background: var(--status-color);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--status-color) 14%, transparent);
+}
+
+.ticket-list h2 {
+    margin: 0;
+    color: var(--text-h);
+    font-size: 0.9rem;
+    font-weight: 720;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+}
+
+.ticket-count {
+    display: grid;
+    min-width: 25px;
+    height: 25px;
+    padding: 0 7px;
+    place-items: center;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--text);
+    font-size: 0.74rem;
+    font-weight: 700;
+}
+
+.ticket-list-content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+@media (max-width: 720px) {
+    .ticket-list {
+        min-height: 400px;
+    }
 }

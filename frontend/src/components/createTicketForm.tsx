@@ -1,10 +1,10 @@
-import { type FormEvent } from 'react'
+import { type SyntheticEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
 export default function CreateTicketForm() {
     const navigate = useNavigate()
 
-    async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    async function handleSubmit(event: SyntheticEvent<HTMLFormElement>) {
         event.preventDefault()
         const form = new FormData(event.currentTarget)
         const title = String(form.get('title') ?? '')
@@ -25,19 +25,42 @@ export default function CreateTicketForm() {
     }
 
     return (
-        <div>
-            <Link to="/">Back to board</Link>
-            <form onSubmit={handleSubmit}>
-                <input type="text" name="title" placeholder="Title" required />
-                <input type="text" name="description" placeholder="Description" />
-                <select name="status" defaultValue="Backlog">
-                    <option value="Backlog">Backlog</option>
-                    <option value="In Progress">In Progress</option>
-                    <option value="Under Review">Under Review</option>
-                    <option value="Completed">Completed</option>
-                </select>
+        <main className="ticket-form-page">
+            <Link className="back-link" to="/">← Back to board</Link>
+            <div className="form-heading">
+                <p className="board-eyebrow">New work item</p>
+                <h1>Create a ticket</h1>
+                <p>Add the details your team needs to get started.</p>
+            </div>
+            <form className="ticket-form" onSubmit={handleSubmit}>
+                <label>
+                    Title
+                    <input
+                        type="text"
+                        name="title"
+                        placeholder="What needs to be done?"
+                        required
+                    />
+                </label>
+                <label>
+                    Description
+                    <textarea
+                        name="description"
+                        placeholder="Add context, requirements, or notes..."
+                        rows={5}
+                    />
+                </label>
+                <label>
+                    Status
+                    <select name="status" defaultValue="Backlog">
+                        <option value="Backlog">Backlog</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Under Review">Under Review</option>
+                        <option value="Completed">Completed</option>
+                    </select>
+                </label>
                 <button type="submit">Create</button>
             </form>
-        </div>
+        </main>
     )
 }

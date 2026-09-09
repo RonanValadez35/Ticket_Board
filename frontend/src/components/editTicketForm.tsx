@@ -1,4 +1,4 @@
-import { type FormEvent, useEffect, useState } from 'react'
+import { type SyntheticEvent, useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 
 type TicketData = {
@@ -31,7 +31,7 @@ export default function EditTicketForm() {
             .catch((requestError: Error) => setError(requestError.message))
     }, [ticketId])
 
-    async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    async function handleSubmit(event: SyntheticEvent<HTMLFormElement>) {
         event.preventDefault()
         if (!ticketId) return
 
@@ -61,7 +61,7 @@ export default function EditTicketForm() {
         return (
             <main className="ticket-form-page">
                 <p>{error}</p>
-                <Link to="/">Back to board</Link>
+                <Link className="back-link" to="/">← Back to board</Link>
             </main>
         )
     }
@@ -72,8 +72,12 @@ export default function EditTicketForm() {
 
     return (
         <main className="ticket-form-page">
-            <Link to="/">Back to board</Link>
-            <h1>Edit ticket</h1>
+            <Link className="back-link" to="/">← Back to board</Link>
+            <div className="form-heading">
+                <p className="board-eyebrow">Ticket #{ticket.id}</p>
+                <h1>Edit ticket</h1>
+                <p>Update the details or move this ticket to a new status.</p>
+            </div>
             <form className="ticket-form" onSubmit={handleSubmit}>
                 <label>
                     Title

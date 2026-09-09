@@ -83,3 +83,16 @@ async def edit_ticket(
     await session.commit()
     await session.refresh(ticket)
     return ticket
+
+@app.delete("/tickets/{ticket_id}", status_code=204)
+async def delete_ticket(
+    ticket_id: int,
+    session: AsyncSession = Depends(get_session),
+):
+    ticket = await session.get(models.Ticket, ticket_id)
+
+    if ticket is None:
+        raise HTTPException(status_code=404, detail="Ticket not found")
+
+    await session.delete(ticket)
+    await session.commit()
