@@ -1,4 +1,4 @@
-import type { FormEvent } from 'react'
+import type { SyntheticEvent } from 'react'
 import { Link } from 'react-router-dom'
 import '../styles/auth.css'
 
@@ -6,40 +6,24 @@ type AuthPageProps = {
   mode: 'sign-in' | 'create-account'
 }
 
-function BrandMark() {
-  return (
-    <span className="brand-mark" aria-hidden="true">
-      <span />
-      <span />
-      <span />
-    </span>
-  )
-}
-
 function AuthPage({ mode }: AuthPageProps) {
   const isSignIn = mode === 'sign-in'
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  function handleSubmit(event: SyntheticEvent<HTMLFormElement>) {
     event.preventDefault()
   }
 
   return (
     <main className="auth-page">
-      <section className="auth-panel" aria-labelledby="auth-title">
-        <Link className="auth-brand" to="/" aria-label="Ticket Board home">
-          <BrandMark />
-          <span>Ticket Board</span>
-        </Link>
-
+      <section className="auth-card" aria-labelledby="auth-title">
         <div className="auth-heading">
-          <p className="auth-eyebrow">{isSignIn ? 'Welcome back' : 'Get started'}</p>
           <h1 id="auth-title">
-            {isSignIn ? 'Sign in to your account' : 'Create your account'}
+            {isSignIn ? 'Sign in' : 'Create account'}
           </h1>
           <p>
             {isSignIn
-              ? 'Enter your details to access your workspace.'
-              : 'Set up your credentials to start organizing your work.'}
+              ? 'Sign in to access your ticket board.'
+              : 'Choose a username and password.'}
           </p>
         </div>
 
@@ -68,52 +52,20 @@ function AuthPage({ mode }: AuthPageProps) {
             />
           </label>
 
-          {isSignIn && (
-            <div className="auth-options">
-              <label className="remember-me">
-                <input type="checkbox" name="remember" />
-                <span>Remember me</span>
-              </label>
-              <button className="text-button" type="button">
-                Forgot password?
-              </button>
-            </div>
-          )}
-
           <button className="auth-submit" type="submit">
             {isSignIn ? 'Sign in' : 'Create account'}
           </button>
         </form>
 
-        <p className="auth-switch">
-          {isSignIn ? "Don't have an account?" : 'Already have an account?'}{' '}
+        <div className="auth-secondary">
+          <p>
+            {isSignIn ? "Don't have an account?" : 'Already have an account?'}
+          </p>
           <Link to={isSignIn ? '/create-account' : '/'}>
             {isSignIn ? 'Create account' : 'Sign in'}
           </Link>
-        </p>
-      </section>
-
-      <aside className="auth-aside" aria-hidden="true">
-        <div className="auth-glow auth-glow-one" />
-        <div className="auth-glow auth-glow-two" />
-        <div className="preview-card">
-          <div className="preview-header">
-            <BrandMark />
-            <span>Everything in one place</span>
-          </div>
-          <div className="preview-ticket preview-ticket-one">
-            <span className="preview-icon">✓</span>
-            <div><strong>Ship with confidence</strong><span>Keep every task moving forward.</span></div>
-          </div>
-          <div className="preview-ticket preview-ticket-two">
-            <span className="preview-icon">↗</span>
-            <div><strong>Stay in sync</strong><span>Clear priorities for your whole team.</span></div>
-          </div>
         </div>
-        <blockquote>
-          “A simple workspace for turning ideas into progress.”
-        </blockquote>
-      </aside>
+      </section>
     </main>
   )
 }
