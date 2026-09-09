@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
-import { Route, Routes, useNavigate } from 'react-router-dom'
+import { Navigate, Route, Routes, useNavigate } from 'react-router-dom'
+import AuthPage, { type AuthUser } from './components/AuthPage.tsx'
 import TicketList from './components/ticketList.tsx'
 import CreateTicketForm from './components/createTicketForm.tsx'
 import EditTicketForm from './components/editTicketForm.tsx'
-import AuthPage from './components/AuthPage.tsx'
 import type { TicketData, TicketStatus } from './types/ticket.ts'
 import './App.css'
 
@@ -14,7 +14,12 @@ const ticketStatuses: TicketStatus[] = [
   'Completed',
 ]
 
-function Board() {
+interface BoardProps {
+  user: AuthUser
+  onSignOut: () => void
+}
+
+function Board({ user, onSignOut }: BoardProps) {
   const navigate = useNavigate()
   const [tickets, setTickets] = useState<TicketData[]>([])
 
@@ -82,6 +87,12 @@ function Board() {
           <span aria-hidden="true">+</span>
           New ticket
         </button>
+        <div className="account-menu">
+          <span>Signed in as <strong>{user.username}</strong></span>
+          <button type="button" className="sign-out-button" onClick={onSignOut}>
+            Sign out
+          </button>
+        </div>
       </header>
       <div className="board-columns">
         {ticketStatuses.map((status) => (
@@ -103,13 +114,42 @@ function Board() {
 }
 
 function App() {
+  const [user, setUser] = useState<AuthUser | null>(() => {
+    const savedUser = localStorage.getItem('ticket-board-user')
+    if (!savedUser) return null
+
+    try {
+      return JSON.parse(savedUser) as AuthUser
+    } catch {
+      localStorage.removeItem('ticket-board-user')
+      return null
+    }
+  })
+
+  function handleAuthenticated(authenticatedUser: AuthUser) {
+    localStorage.setItem('ticket-board-user', JSON.stringify(authenticatedUser))
+    setUser(authenticatedUser)
+  }
+
+  function handleSignOut() {
+    localStorage.removeItem('ticket-board-user')
+    setUser(null)
+  }
+
   return (
     <Routes>
-      <Route path="/" element={<AuthPage mode="sign-in" />} />
-      <Route path="/create-account" element={<AuthPage mode="create-account" />} />
-      <Route path="/board" element={<Board />} />
-      <Route path="/create" element={<CreateTicketForm />} />
-      <Route path="/tickets/:ticketId/edit" element={<EditTicketForm />} />
+      <Route
+        path="/signin"
+        element={user ? <Navigate to="/" replace /> : <AuthPage mode="signin" onAuthenticated={handleAuthenticated} />}
+      />
+      <Route
+        path="/signup"
+        element={user ? <Navigate to="/" replace /> : <AuthPage mode="signup" onAuthenticated={handleAuthenticated} />}
+      />
+      <Route path="/" element={user ? <Board user={user} onSignOut={handleSignOut} /> : <Navigate to="/signin" replace />} />
+      <Route path="/create" element={user ? <CreateTicketForm /> : <Navigate to="/signin" replace />} />
+      <Route path="/tickets/:ticketId/edit" element={user ? <EditTicketForm /> : <Navigate to="/signin" replace />} />
+      <Route path="*" element={<Navigate to={user ? '/' : '/signin'} replace />} />
     </Routes>
   )
 }

@@ -76,6 +76,28 @@
   transform: translateY(-1px);
 }
 
+.account-menu {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text);
+  font-size: 0.82rem;
+}
+
+.account-menu .sign-out-button {
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-h);
+  box-shadow: none;
+}
+
+.account-menu .sign-out-button:hover {
+  border-color: var(--border-strong);
+  background: var(--surface-muted);
+  box-shadow: none;
+}
+
 .board-header button:focus-visible,
 .ticket-form button:focus-visible,
 .back-link:focus-visible {
@@ -186,6 +208,7 @@
 
   .board-header {
     align-items: flex-start;
+    flex-wrap: wrap;
   }
 
   .board-header h1,
@@ -195,6 +218,11 @@
 
   .board-header button {
     flex-shrink: 0;
+  }
+
+  .account-menu {
+    width: 100%;
+    justify-content: flex-end;
   }
 
   .ticket-form-page {
