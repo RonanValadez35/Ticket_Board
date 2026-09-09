@@ -51,6 +51,29 @@
     overflow-wrap: anywhere;
 }
 
+.ticket-owner {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 5px;
+    padding: 4px 9px 4px 5px;
+    border-radius: 999px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-size: 0.72rem;
+}
+
+.ticket-owner span {
+    display: grid;
+    width: 20px;
+    height: 20px;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--accent);
+    color: white;
+    font-weight: 750;
+}
+
 .ticket-edit-button,
 .ticket-delete-button {
     position: absolute;

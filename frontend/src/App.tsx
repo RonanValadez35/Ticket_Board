@@ -149,8 +149,8 @@ function App() {
         element={user ? <Navigate to="/" replace /> : <CreateAccountPage onAuthenticated={handleAuthenticated} />}
       />
       <Route path="/" element={user ? <Board user={user} onSignOut={handleSignOut} /> : <Navigate to="/signin" replace />} />
-      <Route path="/create" element={user ? <CreateTicketForm /> : <Navigate to="/signin" replace />} />
-      <Route path="/tickets/:ticketId/edit" element={user ? <EditTicketForm /> : <Navigate to="/signin" replace />} />
+      <Route path="/create" element={user ? <CreateTicketForm user={user} /> : <Navigate to="/signin" replace />} />
+      <Route path="/tickets/:ticketId/edit" element={user ? <EditTicketForm user={user} /> : <Navigate to="/signin" replace />} />
       <Route path="*" element={<Navigate to={user ? '/' : '/signin'} replace />} />
     </Routes>
   )

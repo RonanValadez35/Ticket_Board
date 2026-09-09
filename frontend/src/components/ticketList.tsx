@@ -67,6 +67,7 @@ export default function TicketList({
                         id={ticket.id}
                         title={ticket.title}
                         description={ticket.description}
+                        ownerUsername={ticket.owner_username}
                         onDeleted={onTicketDeleted}
                     />
                 ))}

@@ -9,4 +9,6 @@ export type TicketData = {
     title: string;
     description: string;
     status: TicketStatus;
+    user_id: number | null;
+    owner_username: string | null;
 };

@@ -1,18 +1,18 @@
 import { type SyntheticEvent, useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
+import type { AuthUser } from '../types/auth'
+import type { TicketData } from '../types/ticket'
 
-type TicketData = {
-    id: number
-    title: string
-    description: string
-    status: string
+type EditTicketFormProps = {
+    user: AuthUser
 }
 
-export default function EditTicketForm() {
+export default function EditTicketForm({ user }: EditTicketFormProps) {
     const { ticketId } = useParams()
     const navigate = useNavigate()
     const [ticket, setTicket] = useState<TicketData | null>(null)
     const [error, setError] = useState('')
+    const [ownsTicket, setOwnsTicket] = useState(false)
 
     useEffect(() => {
         if (!ticketId) return
@@ -24,9 +24,12 @@ export default function EditTicketForm() {
                 }
                 return response.json() as Promise<TicketData>
             })
-            .then(setTicket)
+            .then((loadedTicket) => {
+                setTicket(loadedTicket)
+                setOwnsTicket(loadedTicket.user_id === user.id)
+            })
             .catch((requestError: Error) => setError(requestError.message))
-    }, [ticketId])
+    }, [ticketId, user.id])
 
     async function handleSubmit(event: SyntheticEvent<HTMLFormElement>) {
         event.preventDefault()
@@ -42,6 +45,9 @@ export default function EditTicketForm() {
                     title: String(form.get('title') ?? ''),
                     description: String(form.get('description') ?? ''),
                     status: String(form.get('status') ?? 'Backlog'),
+                    ...(ticket?.user_id === null || ticket?.user_id === user.id
+                        ? { user_id: ownsTicket ? user.id : null }
+                        : {}),
                 }),
             },
         )
@@ -82,6 +88,35 @@ export default function EditTicketForm() {
                 <p>Update the details or move this ticket to a new status.</p>
             </div>
             <form className="ticket-form" onSubmit={handleSubmit}>
+                <section className="ticket-ownership" aria-labelledby="ownership-heading">
+                    <div className="owner-avatar" aria-hidden="true">
+                        {(ticket.owner_username ?? user.username).charAt(0).toUpperCase()}
+                    </div>
+                    <div>
+                        <h2 id="ownership-heading">Ticket owner</h2>
+                        {ticket.user_id !== null && ticket.user_id !== user.id ? (
+                            <p>
+                                Assigned to <strong>{ticket.owner_username}</strong>
+                            </p>
+                        ) : (
+                            <label className="claim-ticket-option">
+                                <input
+                                    type="checkbox"
+                                    checked={ownsTicket}
+                                    onChange={(event) => setOwnsTicket(event.target.checked)}
+                                />
+                                <span>
+                                    <strong>{ownsTicket ? 'Assigned to me' : 'Assign this ticket to me'}</strong>
+                                    <small>
+                                        {ownsTicket
+                                            ? 'Turn off to release ownership of this ticket'
+                                            : `Take ownership as ${user.username}`}
+                                    </small>
+                                </span>
+                            </label>
+                        )}
+                    </div>
+                </section>
                 <label>
                     Title
                     <input

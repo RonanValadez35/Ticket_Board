@@ -9,10 +9,11 @@ type TicketProps = {
     id: number;
     title: string;
     description: string;
+    ownerUsername: string | null;
     onDeleted: (id: number) => void;
 };
 
-export default function Ticket({ id, title, description, onDeleted }: TicketProps) {
+export default function Ticket({ id, title, description, ownerUsername, onDeleted }: TicketProps) {
     const navigate = useNavigate();
     const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
@@ -66,6 +67,12 @@ export default function Ticket({ id, title, description, onDeleted }: TicketProp
             >
                 <h3>{title}</h3>
                 <p>{description}</p>
+                {ownerUsername && (
+                    <div className="ticket-owner" title={`Owned by ${ownerUsername}`}>
+                        <span aria-hidden="true">{ownerUsername.charAt(0).toUpperCase()}</span>
+                        <strong>{ownerUsername}</strong>
+                    </div>
+                )}
                 <button
                     type="button"
                     className="ticket-edit-button"

@@ -36,6 +36,23 @@ app.add_middleware(
 )
 
 
+async def ticket_response(ticket: models.Ticket, session: AsyncSession) -> dict:
+    """Build the public ticket representation, including its owner's name."""
+    owner = (
+        await session.get(models.User, ticket.user_id)
+        if ticket.user_id is not None
+        else None
+    )
+    return {
+        "id": ticket.id,
+        "title": ticket.title,
+        "status": ticket.status,
+        "description": ticket.description,
+        "user_id": ticket.user_id,
+        "owner_username": owner.username if owner is not None else None,
+    }
+
+
 @app.post("/auth/signup", response_model=UserRead, status_code=201)
 async def create_account(
     credentials: AccountCreate,
@@ -81,7 +98,7 @@ async def root(session: AsyncSession = Depends(get_session)):
     query = select(models.Ticket)
     result = await session.execute(query)
     tickets = result.scalars().all()
-    return tickets
+    return [await ticket_response(ticket, session) for ticket in tickets]
 
 
 @app.post("/tickets", response_model=TicketRead)
@@ -89,15 +106,21 @@ async def create_ticket(
     ticket: TicketCreate,
     session: AsyncSession = Depends(get_session),
 ):
+    if ticket.user_id is not None:
+        owner = await session.get(models.User, ticket.user_id)
+        if owner is None:
+            raise HTTPException(status_code=404, detail="User not found")
+
     db_ticket = models.Ticket(
         title=ticket.title,
         status=ticket.status,
         description=ticket.description,
+        user_id=ticket.user_id,
     )
     session.add(db_ticket)
     await session.commit()
     await session.refresh(db_ticket)
-    return db_ticket
+    return await ticket_response(db_ticket, session)
 
 
 @app.get("/tickets/{ticket_id}", response_model=TicketRead)
@@ -109,7 +132,7 @@ async def get_ticket(
     if ticket is None:
         raise HTTPException(status_code=404, detail="Ticket not found")
 
-    return ticket
+    return await ticket_response(ticket, session)
 
 
 @app.patch("/tickets/{ticket_id}", response_model=TicketRead)
@@ -121,16 +144,30 @@ async def edit_ticket(
     ticket = await session.get(models.Ticket, ticket_id)
     if ticket is None:
         raise HTTPException(status_code=404, detail="Ticket not found")
-    
-    for field, value in changes.model_dump(
-        exclude_unset=True,
-        exclude_none=True,
-    ).items():
+
+    supplied_changes = changes.model_dump(exclude_unset=True)
+    owner_was_supplied = "user_id" in supplied_changes
+    requested_owner_id = supplied_changes.pop("user_id", None)
+    if owner_was_supplied and requested_owner_id is None:
+        ticket.user_id = None
+    elif requested_owner_id is not None:
+        owner = await session.get(models.User, requested_owner_id)
+        if owner is None:
+            raise HTTPException(status_code=404, detail="User not found")
+        if ticket.user_id is not None and ticket.user_id != requested_owner_id:
+            raise HTTPException(
+                status_code=409,
+                detail="Ticket is already owned by another user",
+            )
+        ticket.user_id = requested_owner_id
+
+    for field, value in supplied_changes.items():
         setattr(ticket, field, value)
 
     await session.commit()
     await session.refresh(ticket)
-    return ticket
+    return await ticket_response(ticket, session)
+
 
 @app.delete("/tickets/{ticket_id}", status_code=204)
 async def delete_ticket(

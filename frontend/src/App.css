@@ -149,6 +149,70 @@
   gap: 20px;
 }
 
+.ticket-ownership {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid #dcd9ff;
+  border-radius: 12px;
+  background: var(--accent-soft);
+}
+
+.owner-avatar {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--accent);
+  color: white;
+  font-size: 1.05rem;
+  font-weight: 750;
+}
+
+.ticket-ownership h2,
+.ticket-ownership p {
+  margin: 0;
+}
+
+.ticket-ownership h2 {
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.ticket-ownership p {
+  margin-top: 3px;
+  font-size: 0.9rem;
+}
+
+.claim-ticket-option {
+  flex-direction: row !important;
+  align-items: center;
+  gap: 10px !important;
+  margin-top: 5px;
+  cursor: pointer;
+}
+
+.claim-ticket-option input {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: var(--accent);
+}
+
+.claim-ticket-option span {
+  display: flex;
+  flex-direction: column;
+}
+
+.claim-ticket-option small {
+  color: var(--text);
+  font-weight: 400;
+}
+
 .ticket-form label {
   display: flex;
   flex-direction: column;

@@ -5,6 +5,7 @@ class TicketCreate(BaseModel):
     title: str
     status: str = "Backlog"
     description: str = ""
+    user_id: int | None = None
 
 
 class TicketRead(BaseModel):
@@ -14,12 +15,15 @@ class TicketRead(BaseModel):
     title: str
     status: str
     description: str
+    user_id: int | None = None
+    owner_username: str | None = None
 
 
 class TicketUpdate(BaseModel):
     title: str | None = None
     description: str | None = None
     status: str | None = None
+    user_id: int | None = None
 
 
 class AccountCreate(BaseModel):
