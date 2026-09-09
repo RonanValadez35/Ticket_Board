@@ -3,6 +3,7 @@ import { Route, Routes, useNavigate } from 'react-router-dom'
 import TicketList from './components/ticketList.tsx'
 import CreateTicketForm from './components/createTicketForm.tsx'
 import EditTicketForm from './components/editTicketForm.tsx'
+import AuthPage from './components/AuthPage.tsx'
 import type { TicketData, TicketStatus } from './types/ticket.ts'
 import './App.css'
 
@@ -104,7 +105,9 @@ function Board() {
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<Board />} />
+      <Route path="/" element={<AuthPage mode="sign-in" />} />
+      <Route path="/create-account" element={<AuthPage mode="create-account" />} />
+      <Route path="/board" element={<Board />} />
       <Route path="/create" element={<CreateTicketForm />} />
       <Route path="/tickets/:ticketId/edit" element={<EditTicketForm />} />
     </Routes>

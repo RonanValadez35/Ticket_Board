@@ -15,10 +15,7 @@ export default function EditTicketForm() {
     const [error, setError] = useState('')
 
     useEffect(() => {
-        if (!ticketId) {
-            setError('Missing ticket ID')
-            return
-        }
+        if (!ticketId) return
 
         fetch(`http://127.0.0.1:8000/tickets/${ticketId}`)
             .then((response) => {
@@ -54,14 +51,18 @@ export default function EditTicketForm() {
             return
         }
 
-        navigate('/')
+        navigate('/board')
     }
 
-    if (error) {
+    const displayedError = ticketId ? error : 'Missing ticket ID'
+
+    if (displayedError) {
         return (
             <main className="ticket-form-page">
-                <p>{error}</p>
-                <Link className="back-link" to="/">← Back to board</Link>
+                <p>{displayedError}</p>
+                <Link className="back-link" to="/board">
+                    ← Back to board
+                </Link>
             </main>
         )
     }
@@ -72,7 +73,9 @@ export default function EditTicketForm() {
 
     return (
         <main className="ticket-form-page">
-            <Link className="back-link" to="/">← Back to board</Link>
+            <Link className="back-link" to="/board">
+                ← Back to board
+            </Link>
             <div className="form-heading">
                 <p className="board-eyebrow">Ticket #{ticket.id}</p>
                 <h1>Edit ticket</h1>

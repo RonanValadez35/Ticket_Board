@@ -21,12 +21,12 @@ export default function CreateTicketForm() {
             }),
         })
 
-        navigate('/')
+        navigate('/board')
     }
 
     return (
         <main className="ticket-form-page">
-            <Link className="back-link" to="/">← Back to board</Link>
+            <Link className="back-link" to="/board">← Back to board</Link>
             <div className="form-heading">
                 <p className="board-eyebrow">New work item</p>
                 <h1>Create a ticket</h1>
