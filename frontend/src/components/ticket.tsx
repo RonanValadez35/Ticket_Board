@@ -1,6 +1,6 @@
 import editIcon from "../assets/edit_icon.png";
 import deleteIcon from "../assets/delete_icon.png";
-import { useState } from "react";
+import { type DragEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import DeleteTicketModal from "./deleteTicketModal";
 import "../styles/ticket.css";
@@ -17,6 +17,21 @@ export default function Ticket({ id, title, description, onDeleted }: TicketProp
     const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
     const [deleteError, setDeleteError] = useState("");
+
+    function handleDragStart(event: DragEvent<HTMLDivElement>) {
+        if ((event.target as HTMLElement).closest("button")) {
+            event.preventDefault();
+            return;
+        }
+
+        event.dataTransfer.setData("text/plain", String(id));
+        event.dataTransfer.effectAllowed = "move";
+        event.currentTarget.classList.add("ticket--dragging");
+    }
+
+    function handleDragEnd(event: DragEvent<HTMLDivElement>) {
+        event.currentTarget.classList.remove("ticket--dragging");
+    }
 
     async function deleteTicket() {
         setIsDeleting(true);
@@ -43,7 +58,12 @@ export default function Ticket({ id, title, description, onDeleted }: TicketProp
 
     return (
         <>
-            <div className="ticket">
+            <div
+                className="ticket"
+                draggable
+                onDragStart={handleDragStart}
+                onDragEnd={handleDragEnd}
+            >
                 <h3>{title}</h3>
                 <p>{description}</p>
                 <button

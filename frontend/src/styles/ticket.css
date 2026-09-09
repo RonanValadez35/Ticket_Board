@@ -13,6 +13,7 @@
     justify-content: center;
     gap: 7px;
     box-shadow: var(--shadow-sm);
+    cursor: grab;
     transition:
         border-color 160ms ease,
         box-shadow 160ms ease,
@@ -23,6 +24,12 @@
     border-color: var(--border-strong);
     box-shadow: 0 8px 18px rgba(23, 32, 51, 0.08);
     transform: translateY(-2px);
+}
+
+.ticket--dragging {
+    opacity: 0.45;
+    cursor: grabbing;
+    transform: rotate(1deg) scale(0.98);
 }
 
 .ticket h3 {
@@ -187,6 +194,16 @@
     border-top: 3px solid var(--status-color);
     border-radius: 12px;
     background: rgba(238, 241, 247, 0.75);
+    transition:
+        border-color 150ms ease,
+        background 150ms ease,
+        box-shadow 150ms ease;
+}
+
+.ticket-list--drag-over {
+    border-color: var(--status-color);
+    background: color-mix(in srgb, var(--status-color) 9%, var(--surface-muted));
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--status-color) 14%, transparent);
 }
 
 .ticket-list--in-progress {
