@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import joinedload
 
 import models
 from database import Base, engine, get_session
@@ -36,20 +37,15 @@ app.add_middleware(
 )
 
 
-async def ticket_response(ticket: models.Ticket, session: AsyncSession) -> dict:
+def ticket_response(ticket: models.Ticket) -> dict:
     """Build the public ticket representation, including its owner's name."""
-    owner = (
-        await session.get(models.User, ticket.user_id)
-        if ticket.user_id is not None
-        else None
-    )
     return {
         "id": ticket.id,
         "title": ticket.title,
         "status": ticket.status,
         "description": ticket.description,
         "user_id": ticket.user_id,
-        "owner_username": owner.username if owner is not None else None,
+        "owner_username": ticket.owner.username if ticket.owner is not None else None,
     }
 
 
@@ -95,10 +91,10 @@ async def sign_in(
 
 @app.get("/", response_model=list[TicketRead])
 async def root(session: AsyncSession = Depends(get_session)):
-    query = select(models.Ticket)
+    query = select(models.Ticket).options(joinedload(models.Ticket.owner))
     result = await session.execute(query)
     tickets = result.scalars().all()
-    return [await ticket_response(ticket, session) for ticket in tickets]
+    return [ticket_response(ticket) for ticket in tickets]
 
 
 @app.post("/tickets", response_model=TicketRead)
@@ -106,6 +102,7 @@ async def create_ticket(
     ticket: TicketCreate,
     session: AsyncSession = Depends(get_session),
 ):
+    owner = None
     if ticket.user_id is not None:
         owner = await session.get(models.User, ticket.user_id)
         if owner is None:
@@ -115,12 +112,12 @@ async def create_ticket(
         title=ticket.title,
         status=ticket.status,
         description=ticket.description,
-        user_id=ticket.user_id,
+        owner=owner,
     )
     session.add(db_ticket)
     await session.commit()
     await session.refresh(db_ticket)
-    return await ticket_response(db_ticket, session)
+    return ticket_response(db_ticket)
 
 
 @app.get("/tickets/{ticket_id}", response_model=TicketRead)
@@ -128,11 +125,15 @@ async def get_ticket(
     ticket_id: int,
     session: AsyncSession = Depends(get_session),
 ):
-    ticket = await session.get(models.Ticket, ticket_id)
+    ticket = await session.get(
+        models.Ticket,
+        ticket_id,
+        options=(joinedload(models.Ticket.owner),),
+    )
     if ticket is None:
         raise HTTPException(status_code=404, detail="Ticket not found")
 
-    return await ticket_response(ticket, session)
+    return ticket_response(ticket)
 
 
 @app.patch("/tickets/{ticket_id}", response_model=TicketRead)
@@ -141,7 +142,11 @@ async def edit_ticket(
     changes: TicketUpdate,
     session: AsyncSession = Depends(get_session),
 ):
-    ticket = await session.get(models.Ticket, ticket_id)
+    ticket = await session.get(
+        models.Ticket,
+        ticket_id,
+        options=(joinedload(models.Ticket.owner),),
+    )
     if ticket is None:
         raise HTTPException(status_code=404, detail="Ticket not found")
 
@@ -149,7 +154,7 @@ async def edit_ticket(
     owner_was_supplied = "user_id" in supplied_changes
     requested_owner_id = supplied_changes.pop("user_id", None)
     if owner_was_supplied and requested_owner_id is None:
-        ticket.user_id = None
+        ticket.owner = None
     elif requested_owner_id is not None:
         owner = await session.get(models.User, requested_owner_id)
         if owner is None:
@@ -159,14 +164,14 @@ async def edit_ticket(
                 status_code=409,
                 detail="Ticket is already owned by another user",
             )
-        ticket.user_id = requested_owner_id
+        ticket.owner = owner
 
     for field, value in supplied_changes.items():
         setattr(ticket, field, value)
 
     await session.commit()
     await session.refresh(ticket)
-    return await ticket_response(ticket, session)
+    return ticket_response(ticket)
 
 
 @app.delete("/tickets/{ticket_id}", status_code=204)

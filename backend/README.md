@@ -8,6 +8,7 @@ directory:
 ```bash
 uv sync --dev
 uv run pytest
+uvx ruff@0.13.0 check .
 ```
 
 The tests override FastAPI's `get_session` dependency. Every test gets a new

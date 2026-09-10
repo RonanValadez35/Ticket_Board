@@ -1,7 +1,7 @@
 import bcrypt
-from sqlalchemy import String
-from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import ForeignKey, String
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
 from database import Base
 
 
@@ -10,12 +10,13 @@ class Ticket(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int | None] = mapped_column(
-    ForeignKey("users.id", ondelete="SET NULL"),
-    nullable=True,)
-    
+        ForeignKey("users.id", ondelete="SET NULL"),
+        nullable=True,
+    )
     title: Mapped[str] = mapped_column(String(200))
     status: Mapped[str] = mapped_column(String(50))
     description: Mapped[str] = mapped_column(String(1000), default="")
+    owner: Mapped["User | None"] = relationship(back_populates="tickets")
 
 
 class User(Base):
@@ -24,6 +25,7 @@ class User(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     username: Mapped[str] = mapped_column(String(100), unique=True, index=True)
     hashed_password: Mapped[str] = mapped_column(String(60))
+    tickets: Mapped[list[Ticket]] = relationship(back_populates="owner")
 
     @classmethod
     def with_password(cls, username: str, password: str) -> "User":
