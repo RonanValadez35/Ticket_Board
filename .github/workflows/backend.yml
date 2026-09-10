@@ -1,0 +1,26 @@
+name: Backend checks
+
+on:
+  pull_request:
+  push:
+
+jobs:
+  test-and-lint:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - run: uv sync --locked --dev
+      - run: uv run pytest
+      - uses: astral-sh/ruff-action@v3
+        with:
+          version: 0.13.0
+          src: backend

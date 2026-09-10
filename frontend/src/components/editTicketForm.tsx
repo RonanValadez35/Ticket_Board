@@ -57,7 +57,7 @@ export default function EditTicketForm({ user }: EditTicketFormProps) {
             return
         }
 
-        navigate('/board')
+        navigate('/')
     }
 
     const displayedError = ticketId ? error : 'Missing ticket ID'
@@ -66,7 +66,7 @@ export default function EditTicketForm({ user }: EditTicketFormProps) {
         return (
             <main className="ticket-form-page">
                 <p>{displayedError}</p>
-                <Link className="back-link" to="/board">
+                <Link className="back-link" to="/">
                     ← Back to board
                 </Link>
             </main>
@@ -79,7 +79,7 @@ export default function EditTicketForm({ user }: EditTicketFormProps) {
 
     return (
         <main className="ticket-form-page">
-            <Link className="back-link" to="/board">
+            <Link className="back-link" to="/">
                 ← Back to board
             </Link>
             <div className="form-heading">
