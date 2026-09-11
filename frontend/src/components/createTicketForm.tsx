@@ -1,5 +1,6 @@
 import { type SyntheticEvent, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { API_URL } from '../api'
 import type { AuthUser } from '../types/auth'
 
 type CreateTicketFormProps = {
@@ -19,7 +20,7 @@ export default function CreateTicketForm({ user }: CreateTicketFormProps) {
         const status = String(form.get('status') ?? 'Backlog')
 
         setError('')
-        const response = await fetch('http://127.0.0.1:8000/tickets', {
+        const response = await fetch(`${API_URL}/tickets`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

@@ -1,5 +1,6 @@
 import { type SyntheticEvent, useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
+import { API_URL } from '../api'
 import type { AuthUser } from '../types/auth'
 import type { TicketData } from '../types/ticket'
 
@@ -17,7 +18,7 @@ export default function EditTicketForm({ user }: EditTicketFormProps) {
     useEffect(() => {
         if (!ticketId) return
 
-        fetch(`http://127.0.0.1:8000/tickets/${ticketId}`)
+        fetch(`${API_URL}/tickets/${ticketId}`)
             .then((response) => {
                 if (!response.ok) {
                     throw new Error('Ticket not found')
@@ -37,7 +38,7 @@ export default function EditTicketForm({ user }: EditTicketFormProps) {
 
         const form = new FormData(event.currentTarget)
         const response = await fetch(
-            `http://127.0.0.1:8000/tickets/${ticketId}`,
+            `${API_URL}/tickets/${ticketId}`,
             {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
