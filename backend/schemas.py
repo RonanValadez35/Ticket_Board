@@ -2,10 +2,12 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 class TicketCreate(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     title: str
     status: str = "Backlog"
     description: str = ""
-    user_id: int | None = None
+    assigned_to_me: bool = False
 
 
 class TicketRead(BaseModel):
@@ -20,10 +22,12 @@ class TicketRead(BaseModel):
 
 
 class TicketUpdate(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     title: str | None = None
     description: str | None = None
     status: str | None = None
-    user_id: int | None = None
+    assigned_to_me: bool | None = None
 
 
 class AccountCreate(BaseModel):

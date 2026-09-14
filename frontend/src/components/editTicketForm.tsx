@@ -1,6 +1,6 @@
 import { type SyntheticEvent, useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { API_URL } from '../api'
+import { apiFetch } from '../api'
 import type { AuthUser } from '../types/auth'
 import type { TicketData } from '../types/ticket'
 
@@ -18,7 +18,7 @@ export default function EditTicketForm({ user }: EditTicketFormProps) {
     useEffect(() => {
         if (!ticketId) return
 
-        fetch(`${API_URL}/tickets/${ticketId}`)
+        apiFetch(`/tickets/${ticketId}`)
             .then((response) => {
                 if (!response.ok) {
                     throw new Error('Ticket not found')
@@ -37,8 +37,8 @@ export default function EditTicketForm({ user }: EditTicketFormProps) {
         if (!ticketId) return
 
         const form = new FormData(event.currentTarget)
-        const response = await fetch(
-            `${API_URL}/tickets/${ticketId}`,
+        const response = await apiFetch(
+            `/tickets/${ticketId}`,
             {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
@@ -47,7 +47,7 @@ export default function EditTicketForm({ user }: EditTicketFormProps) {
                     description: String(form.get('description') ?? ''),
                     status: String(form.get('status') ?? 'Backlog'),
                     ...(ticket?.user_id === null || ticket?.user_id === user.id
-                        ? { user_id: ownsTicket ? user.id : null }
+                        ? { assigned_to_me: ownsTicket }
                         : {}),
                 }),
             },

@@ -1,6 +1,6 @@
 import { type SyntheticEvent, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { API_URL } from '../api'
+import { apiFetch } from '../api'
 import type { AuthUser } from '../types/auth'
 
 type CreateTicketFormProps = {
@@ -20,14 +20,14 @@ export default function CreateTicketForm({ user }: CreateTicketFormProps) {
         const status = String(form.get('status') ?? 'Backlog')
 
         setError('')
-        const response = await fetch(`${API_URL}/tickets`, {
+        const response = await apiFetch('/tickets', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 title,
                 description,
                 status,
-                ...(claimTicket ? { user_id: user.id } : {}),
+                assigned_to_me: claimTicket,
             }),
         })
 

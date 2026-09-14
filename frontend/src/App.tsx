@@ -7,6 +7,7 @@ import CreateTicketForm from './components/createTicketForm.tsx'
 import EditTicketForm from './components/editTicketForm.tsx'
 import type { AuthUser } from './types/auth.ts'
 import type { TicketData, TicketStatus } from './types/ticket.ts'
+import { apiFetch } from './api.ts'
 import './App.css'
 
 const ticketStatuses: TicketStatus[] = [
@@ -26,7 +27,7 @@ function Board({ user, onSignOut }: BoardProps) {
   const [tickets, setTickets] = useState<TicketData[]>([])
 
   useEffect(() => {
-    fetch('http://127.0.0.1:8000/')
+    apiFetch('/')
       .then((response) => {
         if (!response.ok) {
           throw new Error('Could not load tickets')
@@ -52,8 +53,8 @@ function Board({ user, onSignOut }: BoardProps) {
     )
 
     try {
-      const response = await fetch(
-        `http://127.0.0.1:8000/tickets/${ticketId}`,
+      const response = await apiFetch(
+        `/tickets/${ticketId}`,
         {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
@@ -116,27 +117,31 @@ function Board({ user, onSignOut }: BoardProps) {
 }
 
 function App() {
-  const [user, setUser] = useState<AuthUser | null>(() => {
-    const savedUser = localStorage.getItem('ticket-board-user')
-    if (!savedUser) return null
+  const [user, setUser] = useState<AuthUser | null>(null)
+  const [checkingSession, setCheckingSession] = useState(true)
 
-    try {
-      return JSON.parse(savedUser) as AuthUser
-    } catch {
-      localStorage.removeItem('ticket-board-user')
-      return null
-    }
-  })
+  useEffect(() => {
+    localStorage.removeItem('ticket-board-user')
+    apiFetch('/auth/me')
+      .then((response) => {
+        if (!response.ok) throw new Error('No active session')
+        return response.json() as Promise<AuthUser>
+      })
+      .then(setUser)
+      .catch(() => setUser(null))
+      .finally(() => setCheckingSession(false))
+  }, [])
 
   function handleAuthenticated(authenticatedUser: AuthUser) {
-    localStorage.setItem('ticket-board-user', JSON.stringify(authenticatedUser))
     setUser(authenticatedUser)
   }
 
-  function handleSignOut() {
-    localStorage.removeItem('ticket-board-user')
+  async function handleSignOut() {
+    await apiFetch('/auth/signout', { method: 'POST' })
     setUser(null)
   }
+
+  if (checkingSession) return null
 
   return (
     <Routes>

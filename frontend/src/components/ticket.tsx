@@ -2,7 +2,7 @@ import editIcon from "../assets/edit_icon.png";
 import deleteIcon from "../assets/delete_icon.png";
 import { type DragEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { API_URL } from "../api";
+import { apiFetch } from "../api";
 import DeleteTicketModal from "./deleteTicketModal";
 import "../styles/ticket.css";
 
@@ -40,8 +40,8 @@ export default function Ticket({ id, title, description, ownerUsername, onDelete
         setDeleteError("");
 
         try {
-            const response = await fetch(
-                `${API_URL}/tickets/${id}`,
+            const response = await apiFetch(
+                `/tickets/${id}`,
                 {
                     method: "DELETE",
                 },

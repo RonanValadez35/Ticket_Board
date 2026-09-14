@@ -7,6 +7,9 @@ on:
 jobs:
   test-and-lint:
     runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: sqlite+aiosqlite:///./ci.db
+      FRONTEND_URL: http://localhost:5173
     defaults:
       run:
         working-directory: backend

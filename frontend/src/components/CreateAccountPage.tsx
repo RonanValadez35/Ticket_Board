@@ -1,6 +1,6 @@
 import { useState, type SyntheticEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { API_URL } from '../api.ts'
+import { apiFetch } from '../api.ts'
 import type { AuthUser } from '../types/auth.ts'
 import '../styles/auth.css'
 
@@ -27,7 +27,7 @@ export default function CreateAccountPage({
     setIsSubmitting(true)
 
     try {
-      const response = await fetch(`${API_URL}/auth/signup`, {
+      const response = await apiFetch('/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
